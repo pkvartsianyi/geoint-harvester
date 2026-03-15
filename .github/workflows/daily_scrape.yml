@@ -1,0 +1,29 @@
+name: Scraper Service
+
+on:
+  schedule:
+    # Runs at 08:00 and 20:00 UTC (roughly 2x a day)
+    - cron: '0 8,20 * * *'
+  workflow_dispatch: # Allows you to click a button to run it manually
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22' # Use latest stable Go
+
+      - name: Run Scraper
+        env:
+          # These must be set in your GitHub Repo Settings > Secrets
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
+          TG_SESSION_STRING: ${{ secrets.TG_SESSION_STRING }}
+          PINPOINT_AUTH_TOKEN: ${{ secrets.PINPOINT_AUTH_TOKEN }}
+        run: go run main.go
