@@ -32,7 +32,7 @@ func main() {
 	pinpointAdapter := pinpoint.NewPinpointAdapter(cfg.PinpointAuthToken)
 	scraperService := service.NewScraperService(mongoAdapter, pinpointAdapter)
 
-	tgAdapter, err := telegram.NewTelegramAdapter(cfg.TGAPIID, cfg.TGAPIHash, cfg.TGSessionAuthKey, cfg.TGDC, cfg.TGSessionAddr)
+	tgAdapter, err := telegram.NewTelegramAdapter(cfg.TGAPIID, cfg.TGAPIHash, cfg.TGSessionAuthKey, cfg.TGSessionAuthKeyID, cfg.TGSessionSalt, cfg.TGDC)
 	if err != nil {
 		log.Fatalf("Failed to initialize Telegram adapter: %v", err)
 	}

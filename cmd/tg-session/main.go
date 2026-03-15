@@ -84,21 +84,9 @@ func main() {
 
 		fmt.Println("\n--- Telegram Session Data (Copy to .env) ---")
 		fmt.Printf("TG_SESSION_AUTH_KEY=%s\n", hex.EncodeToString(data.AuthKey))
+		fmt.Printf("TG_SESSION_AUTH_KEY_ID=%s\n", hex.EncodeToString(data.AuthKeyID))
+		fmt.Printf("TG_SESSION_SALT=%d\n", data.Salt)
 		fmt.Printf("TG_DC=%d\n", data.DC)
-		fmt.Printf("TG_SESSION_ADDR=%s\n", data.Addr)
-		
-		// If address is empty, we can't restore easily unless we know it.
-		// DC 4 production address is often 149.154.167.91:443
-		if data.Addr == "" {
-			fmt.Println("# Note: Address was not saved. Suggested address for DC", data.DC, "is:")
-			switch data.DC {
-			case 1: fmt.Println("# TG_SESSION_ADDR=149.154.175.53:443")
-			case 2: fmt.Println("# TG_SESSION_ADDR=149.154.167.51:443")
-			case 3: fmt.Println("# TG_SESSION_ADDR=149.154.175.100:443")
-			case 4: fmt.Println("# TG_SESSION_ADDR=149.154.167.91:443")
-			case 5: fmt.Println("# TG_SESSION_ADDR=91.108.56.130:443")
-			}
-		}
 		fmt.Println("--------------------------------------------")
 
 		return nil

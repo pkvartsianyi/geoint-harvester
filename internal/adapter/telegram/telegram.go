@@ -19,11 +19,12 @@ type TelegramAdapter struct {
 	session *session.Data
 }
 
-// NewTelegramAdapter builds an adapter from the values printed at first login:
-// authKeyHex — the AuthKey (Hex) string
-// dc         — the DC integer
-// addr       — the Addr string (optional)
-func NewTelegramAdapter(appID int, appHash, authKeyHex string, dc int, addr string) (*TelegramAdapter, error) {
+// NewTelegramAdapter builds an adapter from the values printed by the session tool:
+// authKeyHex   — TG_SESSION_AUTH_KEY
+// authKeyIDHex — TG_SESSION_AUTH_KEY_ID
+// salt         — TG_SESSION_SALT
+// dc           — TG_DC
+func NewTelegramAdapter(appID int, appHash, authKeyHex, authKeyIDHex string, salt int64, dc int) (*TelegramAdapter, error) {
 	authKey, err := hex.DecodeString(authKeyHex)
 	if err != nil {
 		return nil, fmt.Errorf("decoding auth key: %w", err)
@@ -32,29 +33,19 @@ func NewTelegramAdapter(appID int, appHash, authKeyHex string, dc int, addr stri
 		return nil, fmt.Errorf("auth key must be 256 bytes, got %d", len(authKey))
 	}
 
-	if addr == "" {
-		// Default DC addresses for production if not provided.
-		switch dc {
-		case 1:
-			addr = "149.154.175.53:443"
-		case 2:
-			addr = "149.154.167.51:443"
-		case 3:
-			addr = "149.154.175.100:443"
-		case 4:
-			addr = "149.154.167.91:443"
-		case 5:
-			addr = "91.108.56.130:443"
-		}
+	authKeyID, err := hex.DecodeString(authKeyIDHex)
+	if err != nil {
+		return nil, fmt.Errorf("decoding auth key ID: %w", err)
 	}
 
 	return &TelegramAdapter{
 		appID:   appID,
 		appHash: appHash,
 		session: &session.Data{
-			DC:      dc,
-			Addr:    addr,
-			AuthKey: authKey,
+			DC:        dc,
+			AuthKey:   authKey,
+			AuthKeyID: authKeyID,
+			Salt:      salt,
 		},
 	}, nil
 }
@@ -62,13 +53,9 @@ func NewTelegramAdapter(appID int, appHash, authKeyHex string, dc int, addr stri
 func (a *TelegramAdapter) Fetch(ctx context.Context, channels []string) ([]domain.Message, error) {
 	storage := &session.StorageMemory{}
 
-	log.Printf("Connecting to Telegram (DC %d, Addr %s, Key len %d)...", a.session.DC, a.session.Addr, len(a.session.AuthKey))
-
-	// Pre-populate storage with the session data to ensure the client
-	// connects to the correct DC from the start.
 	loader := session.Loader{Storage: storage}
 	if err := loader.Save(ctx, a.session); err != nil {
-		return nil, fmt.Errorf("storing session: %w", err)
+		return nil, fmt.Errorf("restoring session: %w", err)
 	}
 
 	client := tdtg.NewClient(a.appID, a.appHash, tdtg.Options{
