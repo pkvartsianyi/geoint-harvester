@@ -2,41 +2,45 @@ package config
 
 import (
 	"log"
-	"os"
-	"strconv"
+
+	"github.com/spf13/viper"
 )
 
 type Config struct {
-	MongoURI        string
-	TGSessionString string
-	TGAPIID         int
-	TGAPIHash       string
+	MongoURI          string
+	TGSessionAuthKey  string
+	TGSessionAddr     string
+	TGAPIID           int
+	TGDC              int
+	TGAPIHash         string
 	PinpointAuthToken string
-	Channels        []string
+	Channels          []string
 }
 
 func Load() *Config {
-	mongoURI := os.Getenv("MONGODB_URI")
-	tgSession := os.Getenv("TG_SESSION_STRING")
-	apiIDStr := os.Getenv("TG_API_ID")
-	apiHash := os.Getenv("TG_API_HASH")
-	pinpointToken := os.Getenv("PINPOINT_AUTH_TOKEN")
+	viper.SetConfigFile(".env")
+	viper.SetConfigType("env")
+	viper.AutomaticEnv()
 
-	if mongoURI == "" || tgSession == "" || apiIDStr == "" || apiHash == "" || pinpointToken == "" {
-		log.Fatal("Missing required environment variables: MONGODB_URI, TG_SESSION_STRING, TG_API_ID, TG_API_HASH, PINPOINT_AUTH_TOKEN")
+	if err := viper.ReadInConfig(); err != nil {
+		log.Println("No .env file found, reading from environment variables")
 	}
 
-	apiID, err := strconv.Atoi(apiIDStr)
-	if err != nil {
-		log.Fatalf("Invalid TG_API_ID: %v", err)
+	required := []string{"MONGODB_URI", "TG_API_ID", "TG_API_HASH", "TG_SESSION_AUTH_KEY", "TG_DC", "PINPOINT_AUTH_TOKEN"}
+	for _, key := range required {
+		if !viper.IsSet(key) {
+			log.Fatalf("Missing required environment variable: %s", key)
+		}
 	}
 
 	return &Config{
-		MongoURI:        mongoURI,
-		TGSessionString: tgSession,
-		TGAPIID:         apiID,
-		TGAPIHash:       apiHash,
-		PinpointAuthToken: pinpointToken,
-		Channels:        []string{"telegram", "durov"},
+		MongoURI:          viper.GetString("MONGODB_URI"),
+		TGSessionAuthKey:  viper.GetString("TG_SESSION_AUTH_KEY"),
+		TGSessionAddr:     viper.GetString("TG_SESSION_ADDR"),
+		TGAPIID:           viper.GetInt("TG_API_ID"),
+		TGDC:              viper.GetInt("TG_DC"),
+		TGAPIHash:         viper.GetString("TG_API_HASH"),
+		PinpointAuthToken: viper.GetString("PINPOINT_AUTH_TOKEN"),
+		Channels:          []string{"telegram", "durov"},
 	}
 }

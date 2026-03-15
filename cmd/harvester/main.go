@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/gotd/td/session"
 	"github.com/pkvartsianyi/geoint-harvester/internal/adapter/db"
 	"github.com/pkvartsianyi/geoint-harvester/internal/adapter/pinpoint"
 	"github.com/pkvartsianyi/geoint-harvester/internal/adapter/telegram"
@@ -33,12 +32,11 @@ func main() {
 	pinpointAdapter := pinpoint.NewPinpointAdapter(cfg.PinpointAuthToken)
 	scraperService := service.NewScraperService(mongoAdapter, pinpointAdapter)
 
-	data, err := session.TelethonSession(cfg.TGSessionString)
+	tgAdapter, err := telegram.NewTelegramAdapter(cfg.TGAPIID, cfg.TGAPIHash, cfg.TGSessionAuthKey, cfg.TGDC, cfg.TGSessionAddr)
 	if err != nil {
-		log.Fatalf("Failed to parse Telegram session string: %v", err)
+		log.Fatalf("Failed to initialize Telegram adapter: %v", err)
 	}
 
-	tgAdapter := telegram.NewTelegramAdapter(cfg.TGAPIID, cfg.TGAPIHash, data)
 	if err := scraperService.Run(ctx, cfg.Channels, tgAdapter); err != nil {
 		log.Fatalf("Scraping failed: %v", err)
 	}
