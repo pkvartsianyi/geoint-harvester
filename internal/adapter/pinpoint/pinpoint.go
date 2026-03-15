@@ -25,11 +25,11 @@ type PinpointAdapter struct {
 	url        string
 }
 
-func NewPinpointAdapter(token string) *PinpointAdapter {
+func NewPinpointAdapter(url, token string) *PinpointAdapter {
 	return &PinpointAdapter{
 		httpClient: &http.Client{},
 		token:      token,
-		url:        "https://pinpoint-9clk.onrender.com/extract",
+		url:        url,
 	}
 }
 
@@ -39,7 +39,7 @@ func (a *PinpointAdapter) Extract(ctx context.Context, text string) (*domain.Geo
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", a.url, bytes.NewBuffer(reqBody))
+	req, err := http.NewRequestWithContext(ctx, "POST", a.url+"/extract", bytes.NewBuffer(reqBody))
 	if err != nil {
 		return nil, err
 	}

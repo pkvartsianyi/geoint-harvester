@@ -29,7 +29,7 @@ func main() {
 		}
 	}()
 
-	pinpointAdapter := pinpoint.NewPinpointAdapter(cfg.PinpointAuthToken)
+	pinpointAdapter := pinpoint.NewPinpointAdapter(cfg.PinpointURL, cfg.PinpointAuthToken)
 	scraperService := service.NewScraperService(mongoAdapter, pinpointAdapter)
 
 	tgAdapter, err := telegram.NewTelegramAdapter(cfg.TGAPIID, cfg.TGAPIHash, cfg.TGSessionAuthKey, cfg.TGSessionAuthKeyID, cfg.TGSessionSalt, cfg.TGDC)

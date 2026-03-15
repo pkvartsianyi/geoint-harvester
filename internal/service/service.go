@@ -61,10 +61,10 @@ func (s *ScraperService) Run(ctx context.Context, channels []string, sources ...
 	for i := range newMsgs {
 		if s.extractor != nil && newMsgs[i].Content != "" {
 			geo, err := s.extractor.Extract(ctx, newMsgs[i].Content)
-			if err == nil {
+			if err == nil && geo.Coordinates != nil {
 				newMsgs[i].Geolocation = geo
 			} else {
-				log.Printf("Extraction failed for msg %d: %v", newMsgs[i].MsgID, err)
+				log.Printf("Extraction failed for msg %d: %s", newMsgs[i].MsgID, err)
 				continue
 			}
 		}

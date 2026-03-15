@@ -14,6 +14,7 @@ type Config struct {
 	TGAPIID            int
 	TGDC               int
 	TGAPIHash          string
+	PinpointURL        string
 	PinpointAuthToken  string
 	Channels           []string
 }
@@ -43,6 +44,7 @@ func Load() *Config {
 		TGDC:               viper.GetInt("TG_DC"),
 		TGAPIHash:          viper.GetString("TG_API_HASH"),
 		PinpointAuthToken:  viper.GetString("PINPOINT_AUTH_TOKEN"),
+		PinpointURL:        viper.GetString("PINPOINT_URL"),
 		Channels:           []string{"milinfolive"},
 	}
 }
