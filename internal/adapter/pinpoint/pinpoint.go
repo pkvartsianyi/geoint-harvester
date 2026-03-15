@@ -45,7 +45,7 @@ func (a *PinpointAdapter) Extract(ctx context.Context, text string) (*domain.Geo
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+a.token)
+	req.Header.Set("Authorization", a.token)
 
 	resp, err := a.httpClient.Do(req)
 	if err != nil {

@@ -7,15 +7,15 @@ import (
 )
 
 type Config struct {
-	MongoURI               string
-	TGSessionAuthKey       string
-	TGSessionAuthKeyID     string
-	TGSessionSalt          int64
-	TGAPIID                int
-	TGDC                   int
-	TGAPIHash              string
-	PinpointAuthToken      string
-	Channels               []string
+	MongoURI           string
+	TGSessionAuthKey   string
+	TGSessionAuthKeyID string
+	TGSessionSalt      int64
+	TGAPIID            int
+	TGDC               int
+	TGAPIHash          string
+	PinpointAuthToken  string
+	Channels           []string
 }
 
 func Load() *Config {
@@ -43,6 +43,6 @@ func Load() *Config {
 		TGDC:               viper.GetInt("TG_DC"),
 		TGAPIHash:          viper.GetString("TG_API_HASH"),
 		PinpointAuthToken:  viper.GetString("PINPOINT_AUTH_TOKEN"),
-		Channels:           []string{"telegram", "durov"},
+		Channels:           []string{"milinfolive"},
 	}
 }

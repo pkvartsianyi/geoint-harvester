@@ -65,6 +65,7 @@ func (s *ScraperService) Run(ctx context.Context, channels []string, sources ...
 				newMsgs[i].Geolocation = geo
 			} else {
 				log.Printf("Extraction failed for msg %d: %v", newMsgs[i].MsgID, err)
+				continue
 			}
 		}
 
